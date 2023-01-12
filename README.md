@@ -11,8 +11,3 @@
 - JSON Web Token
 - Multer
 - BCrypt
-
-2XX - Success
-3XX - Redirect
-4XX - Client Error
-5XX - Server Error
