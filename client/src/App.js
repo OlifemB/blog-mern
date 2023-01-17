@@ -4,7 +4,7 @@ import {Header} from "./components";
 import {Home, FullPost, Registration, AddPost, Login} from "./pages";
 import {Route, Routes} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {fetchAuth, selectIsAuth} from "./redux/slices/auth";
 
 function App() {

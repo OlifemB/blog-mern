@@ -1,12 +1,12 @@
 export const commentsData = [
     {
-        user: {
+        author: {
             fullName: 'User 1',
         },
         text: 'Test comment 1',
     },
     {
-        user: {
+        author: {
             fullName: 'User 1',
         },
         text: 'Test comment 2',

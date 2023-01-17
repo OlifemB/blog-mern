@@ -16,6 +16,7 @@ export const fetchRemovePost = createAsyncThunk('posts/delete', async (id) => {
     axios.delete('/posts/' + id)
 })
 
+
 const initialState = {
     posts: {
         items: [],

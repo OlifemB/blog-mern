@@ -13,7 +13,6 @@ import {useDispatch} from "react-redux";
 import {fetchRemovePost} from "../../redux/slices/posts";
 
 export const PostItem = (props) => {
-    const dispatch = useDispatch()
     const {
         _id,
         title,
@@ -28,6 +27,9 @@ export const PostItem = (props) => {
         isLoading,
         isEditable
     } = props
+
+    const dispatch = useDispatch()
+
 
     if (isLoading) {
         return <PostSkeleton/>;
