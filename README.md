@@ -1,13 +1,14 @@
-### React v18
+### Frontend
+- React v18
 - Redux Toolkit
 - React Hook Form
 - React Router v6
 - React Markdown
 - Axios
 
-### NodeJS
+### Backend
 - Express + Validator
 - MongoDB + Mongoose
-- JSON Web Token
+- JWT
 - Multer
 - BCrypt
