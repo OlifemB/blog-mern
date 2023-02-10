@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {UserModel} from "../models/index.js";
+import {UserModel} from "../schemas/index.js";
+
+const SECRET_KEY = 'random-secret-key'
 
 export const register = async (req, res, next) => {
     try {
@@ -18,13 +20,13 @@ export const register = async (req, res, next) => {
         const user = await doc.save()
 
         const token = jwt.sign(
-          {
-              _id: user._id,
-          },
-          process.env.SECRET_KEY,
-          {
-              expiresIn: '30d',
-          },
+            {
+                _id: user._id,
+            },
+            SECRET_KEY,
+            {
+                expiresIn: '30d',
+            },
         );
 
         const {passwordHash, ...userData} = user._doc;
@@ -35,9 +37,9 @@ export const register = async (req, res, next) => {
 
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'Error registration'
-          })
+            res.status(500).json({
+                message: err
+            })
         )
     }
 }
@@ -53,6 +55,7 @@ export const login = async (req, res, next) => {
         }
 
         const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash)
+
         if (!isValidPass) {
             return res.status(400).json({
                 message: 'Incorrect login or password'
@@ -60,16 +63,17 @@ export const login = async (req, res, next) => {
         }
 
         const token = jwt.sign(
-          {
-              _id: user._id,
-          },
-          process.env.SECRET_KEY,
-          {
-              expiresIn: '30d',
-          },
+            {
+                _id: user._id,
+            },
+            SECRET_KEY,
+            {
+                expiresIn: '30d',
+            },
         );
 
         const {passwordHash, ...userData} = user._doc
+
         res.json({
             ...userData,
             token
@@ -77,15 +81,15 @@ export const login = async (req, res, next) => {
 
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'Failed to login'
-          })
+            res.status(500).json({
+                message: err
+            })
         )
     }
 }
 
 
-export const check = async (req, res, next) => {
+export const auth = async (req, res, next) => {
     try {
         const user = await UserModel.findById(req.userId);
 
@@ -100,9 +104,9 @@ export const check = async (req, res, next) => {
 
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'Error: ' + err
-          })
+            res.status(500).json({
+                message: 'Error: ' + err
+            })
         )
 
     }

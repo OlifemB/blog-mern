@@ -1,16 +1,29 @@
-import {CommentModel} from '../models/index.js'
+import {CommentModel, PostModel} from '../schemas/index.js'
 
 
 export const getAll = async (req, res, next) => {
     try {
         const comments = await CommentModel.find().populate('author').exec()
-
+        const {author, ...commentsData} = comments
         res.json(comments)
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'comments.getAll error: ' + err
-          })
+            res.status(500).json({
+                message: 'comments.getAll error: ' + err
+            })
+        )
+    }
+}
+
+export const getByPostId = async (req, res, next) => {
+    try {
+        const comments = await CommentModel.find({post: req.body.post}).populate('author').exec()
+        res.json(comments)
+    } catch (err) {
+        next(
+            res.status(500).json({
+                message: 'comments.getAll error: ' + err
+            })
         )
     }
 }
@@ -18,10 +31,8 @@ export const getAll = async (req, res, next) => {
 
 export const getOne = async (req, res, next) => {
     try {
-        const commentId = req.params.id
-
         CommentModel.findOne({
-            _id: commentId
+            _id: req.params.id
         }, (err, doc) => {
             if (err) {
                 return res.status(500).json({
@@ -34,34 +45,51 @@ export const getOne = async (req, res, next) => {
                 })
             }
             res.json(doc)
-        }).populate('user')
+
+        }).populate('author')
     } catch (err) {
-        next(
-          res.status(500).json({
-              message: 'comments.getOne error: ' + err
-          })
-        )
+        res.status(500).json({
+            message: 'comments.getOne error: ' + err
+        })
     }
 }
 
 
 export const create = async (req, res, next) => {
     try {
-        const date = new Date()
         const doc = new CommentModel({
             text: req.body.text,
+            postId: req.body.postId,
             author: req.userId,
-            createAt: date
+            createdAt: new Date(),
         })
 
         const comment = await doc.save()
 
-        res.json(comment)
+        PostModel.findOneAndUpdate({
+            _id: req.body.postId
+        }, {
+            $push: {comments: comment._id}
+        }, (err, doc) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'posts.getOne error: ' + err
+                })
+            }
+            if (!doc) {
+                return res.status(404).json({
+                    message: 'post not found'
+                })
+            }
+            res.json(comment)
+        })
+
+
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'comments.create error: ' + err
-          })
+            res.status(500).json({
+                message: 'comments.create error: ' + err
+            })
         )
     }
 }
@@ -69,56 +97,79 @@ export const create = async (req, res, next) => {
 
 export const remove = async (req, res, next) => {
     try {
-        const commentId = req.params.id
-
-        CommentModel.findOneAndRemove({
-              _id: commentId
-          },
-          (err, doc) => {
-              if (err) {
-                  return res.status(500).json({
-                      message: err
-                  })
-              }
-
-              if (!doc) {
-                  return res.status(404).json({
-                      message: 'Cant find comment by id: ' + commentId
-                  })
-              }
-          })
-
-        res.json({
-            message: 'success'
+        const comment = await CommentModel.findOneAndRemove({
+            _id: req.params.id
         })
-    } catch (err) {
-        next(
-          res.status(500).json({
-              message: 'Comment delete error: ' + err
-          })
+
+        console.log(comment.postId)
+
+        const post = await PostModel.findByIdAndUpdate(
+            comment.postId,
+            {
+                $pull: {comments: req.params.id}
+            }, {
+                new: true
+            }
         )
+
+        res.json({success: true})
+
+    } catch (err) {
+        res.status(500).json({
+            error: err
+        })
     }
 }
 
 
 export const update = async (req, res, next) => {
     try {
-        const commentId = req.params.id
+        const doc = await CommentModel.findByIdAndUpdate(
+            req.params.id,
+            {
+                text: req.body.text,
+                updatedAt: new Date(),
+            }, {
+                new: true
+            })
 
-        await CommentModel.updateOne({
-            _id: commentId
-        }, {
-            text: req.body.text
-        })
-
-        res.json({
-            message: 'success'
-        })
+        res.json(doc)
     } catch (err) {
         next(
-          res.status(500).json({
-              message: 'comments.update error: ' + err
-          })
+            res.status(500).json({
+                message: 'comments.update error: ' + err
+            })
         )
+    }
+}
+
+
+export const getPostComments = async (req, res, next) => {
+    try {
+        const comments = await CommentModel.find().populate('author').limit(5).exec()
+
+        res.json(comments)
+    } catch (err) {
+        next(
+            res.status(500).json({
+                message: 'posts.getLastComments error: ' + err
+            })
+        )
+
+    }
+}
+
+export const getLastComments = async (req, res, next) => {
+    try {
+        const comments = await CommentModel.find().populate('author').limit(5).exec()
+
+        res.json(comments)
+    } catch (err) {
+        next(
+            res.status(500).json({
+                message: 'posts.getLastComments error: ' + err
+            })
+        )
+
     }
 }

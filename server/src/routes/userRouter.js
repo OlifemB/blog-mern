@@ -8,6 +8,6 @@ const userRouter = new Router()
 
 userRouter.post('/register', userValidation.register, handleValidationErrors, userController.register)
 userRouter.post('/login', userValidation.login, handleValidationErrors, userController.login)
-userRouter.get('/auth', authMiddleware.checkAuth, userController.check)
+userRouter.get('/auth', authMiddleware.checkAuth, userController.auth)
 
 export default userRouter

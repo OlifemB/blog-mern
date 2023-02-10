@@ -12,5 +12,6 @@ postRouter.get('/:id', postController.getOne)
 postRouter.post('/', authMiddleware.checkAuth, handleValidationErrors, postValidation.create, postController.create)
 postRouter.delete('/:id', authMiddleware.checkAuth, postController.remove)
 postRouter.patch('/:id', authMiddleware.checkAuth, handleValidationErrors, postController.update)
+postRouter.get('/:id/comments',  postController.getPostComments)
 
 export default postRouter

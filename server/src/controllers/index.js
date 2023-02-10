@@ -1,11 +1,5 @@
-import * as postController from "./postController.js";
-import * as userController from "./userController.js";
-import * as fileController from "./fileController.js";
-import * as commentController from "./commentController.js"
+export * as postController from "./postController.js";
+export * as userController from "./userController.js";
+export * as fileController from "./fileController.js";
+export * as commentController from "./commentController.js"
 
-export {
-    postController,
-    commentController,
-    userController,
-    fileController,
-}
