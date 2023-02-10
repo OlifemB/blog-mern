@@ -1,5 +1,7 @@
-export { Home } from "./Home";
-export { FullPost } from "./FullPost";
-export { AddPost } from "./AddPost/AddPost";
-export { Registration } from "./Registration/Registration";
-export { Login } from "./Login/Login";
+export * from "./Home";
+export * from "./FullPost";
+export * from "./AddPost";
+export * from "./Registration";
+export * from "./Login";
+export * from "./Tags";
+export * from './Test'

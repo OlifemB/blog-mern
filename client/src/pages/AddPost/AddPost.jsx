@@ -4,16 +4,18 @@ import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import styles from './AddPost.module.scss';
 import {useSelector} from "react-redux";
-import {selectIsAuth} from "../../redux/slices/auth";
-import {Navigate, useNavigate, useParams} from "react-router-dom";
-import axios from "../../axios";
+import {selectIsAuth} from "../../redux/user";
+import {useParams, useNavigate, Navigate} from "react-router-dom";
+import axios from "../../utils/axios";
+import {InputTags} from "../../components";
 
-export const AddPost = () => {
+const AddPost = () => {
     const isAuth = useSelector(selectIsAuth)
     const navigate = useNavigate()
-    const [state, setState] = useState({title: '', tags: '', imageUrl: ''})
+    const [state, setState] = useState({title: '', imageUrl: ''})
+    const [tags, setTags] = useState([])
     const [text, setText] = useState('')
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const inputFileRef = useRef(null)
 
     const {id} = useParams()
@@ -25,28 +27,29 @@ export const AddPost = () => {
     }, []);
 
     const options = useMemo(
-      () => ({
-          spellChecker: false,
-          maxHeight: '400px',
-          autofocus: true,
-          placeholder: 'Enter text...',
-          status: false,
-          autosave: {
-              enabled: true,
-              delay: 1000,
-          },
-      }),
-      [],
+        () => ({
+            spellChecker: false,
+            autofocus: true,
+            placeholder: 'Enter text...',
+            status: false,
+            autosave: {
+                enabled: true,
+                delay: 1000,
+            },
+        }),
+        [],
     );
 
     useEffect(() => {
         if (isEditing) {
             axios.get(`/posts/${id}`).then(({data}) => {
-                setState({title: data.title, tags: data.tags.join(' '), imageUrl: data.imageUrl})
+                setState({title: data.title, imageUrl: data.imageUrl})
                 setText(data.text)
+                setTags(data.tags)
             }).catch(err => console.warn(err))
         } else {
-            setState({title: '', tags: '', imageUrl: ''})
+            setState({title: '', imageUrl: ''})
+            setTags([])
             setText('')
         }
     }, [isEditing])
@@ -64,24 +67,43 @@ export const AddPost = () => {
         }
     };
 
-    const onSubmit = async () => {
+    const handleCratePost = async () => {
         try {
-            setLoading(true)
+            setIsLoading(true)
 
             const fields = {
                 title: state.title,
                 text: text,
-                tags: state.tags,
-                imageUrl: state.imageUrl
+                tags: tags,
+                imageUrl: state.imageUrl,
+            }
+            const {data} = await axios.post('/posts', fields)
+
+            setIsLoading(false)
+            navigate(`/posts/${data._id}`)
+        } catch (err) {
+            console.warn(err)
+        }
+    }
+
+    const handleUpdatePost = async () => {
+        try {
+            setIsLoading(true)
+
+            const fields = {
+                title: state.title,
+                text: text,
+                tags: tags,
+                imageUrl: state.imageUrl,
+                updatedAt: new Date()
             }
 
-            const {data} = isEditing
-              ? await axios.patch(`/posts/${id}`, fields)
-              : await axios.post('/posts', fields)
+            console.log(fields)
 
-            const _id = isEditing ? id : data._id
+            const {data} = await axios.patch(`/posts/${id}`, fields)
 
-            navigate(`/posts/${_id}`)
+            setIsLoading(false)
+            navigate(`/posts/${id}`)
         } catch (err) {
             console.warn(err)
         }
@@ -91,88 +113,85 @@ export const AddPost = () => {
     if (!window.localStorage.getItem('token') && !isAuth)
         return <Navigate to={"/"}/>
 
-
     return (
-      <Paper style={{padding: 30}}>
-          <form>
-              <Button
-                onClick={() => inputFileRef.current.click()}
-                variant="outlined"
-                size="large"
-              >
-                  Add Preview
-              </Button>
-
-              <input
-                ref={inputFileRef}
-                type="file"
-                accept='.png, .jpg, .jpeg'
-                onChange={handleChangeFile}
-                hidden
-              />
-
-              {state.imageUrl && (
+        <Paper style={{padding: 30}}>
+            <form>
                 <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => setState({...state, imageUrl: ''})}
-                >
-                    Удалить
-                </Button>
-              )}
-
-              {state.imageUrl && (
-                <img
-                  className={styles.image}
-                  src={`http://localhost:5000${state.imageUrl}`}
-                  alt="Uploaded"
-                />
-              )}
-
-              <br/>
-              <br/>
-
-              <TextField
-                classes={{root: styles.title}}
-                value={state.title}
-                onChange={(e) => setState({...state, title: e.target.value})}
-                variant="standard"
-                placeholder="Post Title..."
-                fullWidth
-              />
-
-              <TextField
-                classes={{root: styles.tags}}
-                value={state.tags}
-                onChange={(e) => setState({...state, tags: e.target.value})}
-                variant="standard"
-                placeholder="Tags"
-                fullWidth
-              />
-
-              <SimpleMDE
-                className={styles.editor}
-                value={text}
-                onChange={(e) => onChangeSimpleMDE(e)}
-                options={options}
-              />
-
-              <div className={styles.buttons}>
-                  <Button
-                    onClick={onSubmit}
+                    onClick={() => inputFileRef.current.click()}
+                    variant="outlined"
                     size="large"
-                    variant="contained"
-                  >
-                      {isEditing ? 'Save' : 'Create'}
-                  </Button>
+                >
+                    Add Preview
+                </Button>
 
-                  <a href="/">
-                      <Button size="large">
-                          Cancel
-                      </Button>
-                  </a>
-              </div>
-          </form>
-      </Paper>
+                <input
+                    ref={inputFileRef}
+                    type="file"
+                    accept='.png, .jpg, .jpeg'
+                    onChange={handleChangeFile}
+                    hidden
+                />
+
+                {state.imageUrl && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => setState({...state, imageUrl: ''})}
+                    >
+                        Удалить
+                    </Button>
+                )}
+
+                {state.imageUrl && (
+                    <img
+                        className={styles.image}
+                        src={`http://localhost:5000${state.imageUrl}`}
+                        alt="Uploaded"
+                    />
+                )}
+
+                <br/>
+                <br/>
+
+                <TextField
+                    classes={{root: styles.title}}
+                    value={state.title}
+                    onChange={(e) => setState({...state, title: e.target.value})}
+                    variant="standard"
+                    placeholder="Post Title..."
+                    fullWidth={true}
+                />
+
+
+                <InputTags tags={tags} setTags={setTags}/>
+
+                <SimpleMDE
+                    className={styles.editor}
+                    value={text}
+                    onChange={(e) => onChangeSimpleMDE(e)}
+                    options={options}
+                />
+
+                <div className={styles.buttons}>
+                    <Button
+                        onClick={isEditing ? handleUpdatePost : handleCratePost}
+                        size="large"
+                        variant="contained"
+                    >
+                        {isEditing ? 'Save' : 'Create'}
+                    </Button>
+
+
+                    <Button
+                        onClick={() => navigate(`/posts/${id}`)}
+                        size="large"
+                    >
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </Paper>
     );
 };
+
+export default AddPost

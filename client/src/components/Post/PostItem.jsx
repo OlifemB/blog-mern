@@ -8,9 +8,9 @@ import CommentIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import styles from './Post.module.scss';
 import {UserInfo} from '../UserInfo/UserInfo';
 import {PostSkeleton} from './PostSkeleton';
-import {Link} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import {fetchRemovePost} from "../../redux/slices/posts";
+import {removePost} from "../../redux/post";
 
 export const PostItem = (props) => {
     const {
@@ -20,7 +20,7 @@ export const PostItem = (props) => {
         imageUrl,
         author,
         viewsCount,
-        commentsCount,
+        comments,
         tags,
         children,
         isFullPost,
@@ -28,18 +28,16 @@ export const PostItem = (props) => {
         isEditable
     } = props
 
+    const navigate = useNavigate()
     const dispatch = useDispatch()
-
-
-    if (isLoading) {
-        return <PostSkeleton/>;
-    }
 
 
     const onClickRemove = async () => {
         try {
             if (window.confirm('Delete post?')) {
-                await dispatch(fetchRemovePost(_id))
+                if (isFullPost)
+                    navigate(`/`)
+                await dispatch(removePost(_id))
             }
         } catch (err) {
             console.warn(err)
@@ -47,59 +45,63 @@ export const PostItem = (props) => {
     };
 
     return (
-      <div className={clsx(styles.root, {[styles.rootFull]: isFullPost})}>
-          {isEditable && (
-            <div className={styles.editButtons}>
-                <Link to={`/posts/${_id}/edit`}>
-                    <IconButton color="primary">
-                        <EditIcon/>
+        <div className={clsx(styles.root, {[styles.rootFull]: isFullPost})}>
+            {isEditable && (
+                <div className={styles.editButtons}>
+                    <Link to={`/posts/${_id}/edit`}>
+                        <IconButton color="primary">
+                            <EditIcon/>
+                        </IconButton>
+                    </Link>
+
+                    <IconButton onClick={onClickRemove} color="secondary">
+                        <DeleteIcon/>
                     </IconButton>
-                </Link>
+                </div>
+            )}
 
-                <IconButton onClick={onClickRemove} color="secondary">
-                    <DeleteIcon/>
-                </IconButton>
-            </div>
-          )}
+            {imageUrl && (
+                <div className={styles.imageWrapper}>
+                    <img
+                        className={clsx(styles.image, {[styles.imageFull]: isFullPost})}
+                        src={`http://localhost:5000${imageUrl}`}
+                        alt={title}
+                    />
+                </div>
+            )}
 
-          {imageUrl && (
-            <img
-              className={clsx(styles.image, {[styles.imageFull]: isFullPost})}
-              src={`http://localhost:5000${imageUrl}`}
-              alt={title}
-            />
-          )}
+            <div className={styles.wrapper}>
+                <UserInfo {...author} additionalText={createdAt}/>
 
-          <div className={styles.wrapper}>
-              <UserInfo {...author} additionalText={createdAt}/>
+                <div className={styles.indention}>
+                    <h2 className={clsx(styles.title, {[styles.titleFull]: isFullPost})}>
+                        {isFullPost ? title : <Link to={`/posts/${_id}`}>{title}</Link>}
+                    </h2>
 
-              <div className={styles.indention}>
-                  <h2 className={clsx(styles.title, {[styles.titleFull]: isFullPost})}>
-                      {isFullPost ? title : <Link to={`/posts/${_id}`}>{title}</Link>}
-                  </h2>
+                    {tags[0]?.length > 0 && (
+                        <ul className={styles.tags}>
+                            {tags.map((name) => (
+                                <li key={name}>
+                                    <Link to={`/tags/${name}`}>#{name}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
-                  <ul className={styles.tags}>
-                      {tags.map((name) => (
-                        <li key={name}>
-                            <Link to={`/tag/${name}`}>#{name}</Link>
+                    {children && <div className={styles.content}>{children}</div>}
+
+                    <ul className={styles.postDetails}>
+                        <li>
+                            <EyeIcon/>
+                            <span>{viewsCount}</span>
                         </li>
-                      ))}
-                  </ul>
-
-                  {children && <div className={styles.content}>{children}</div>}
-
-                  <ul className={styles.postDetails}>
-                      <li>
-                          <EyeIcon/>
-                          <span>{viewsCount}</span>
-                      </li>
-                      <li>
-                          <CommentIcon/>
-                          <span>{commentsCount}</span>
-                      </li>
-                  </ul>
-              </div>
-          </div>
-      </div>
+                        <li>
+                            <CommentIcon/>
+                            <span>{comments.length}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     );
 };
