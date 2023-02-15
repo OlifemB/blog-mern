@@ -1,14 +1,14 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {TextField, Paper, Button} from '@mui/material';
 import SimpleMDE from 'react-simplemde-editor';
+import {useSelector} from "react-redux";
+import {useParams, useNavigate, Navigate} from "react-router-dom";
 import 'easymde/dist/easymde.min.css';
 import styles from './AddPost.module.scss';
-import {useSelector} from "react-redux";
-import {selectIsAuth} from "@/redux/user";
-import {useParams, useNavigate, Navigate} from "react-router-dom";
-import axios from "@/utils/axios";
-import {InputTags} from "@/components";
-import {useAddPostMutation} from "@/redux";
+import {selectIsAuth} from "src/redux/user";
+import axios from "src/utils/axios";
+import {InputTags} from "src/components";
+import {useAddPostMutation} from "src/redux";
 
 const AddPost = () => {
     const isAuth = useSelector(selectIsAuth)

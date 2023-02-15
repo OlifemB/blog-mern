@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import axios from "../../utils/axios";
+import axios from "src/utils/axios";
 
 
 export const fetchPosts = createAsyncThunk(

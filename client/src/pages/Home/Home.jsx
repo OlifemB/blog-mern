@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {Tabs, Tab, Grid, Container} from '@mui/material';
 
-import {TagsBlock, CommentBlock, PostList} from '../../components';
+import {TagsBlock, CommentBlock, PostList} from 'src/components';
 
 import {useDispatch, useSelector} from "react-redux";
-import {fetchPosts} from "../../redux";
-import {fetchLastComments, useGetCommentsQuery, useGetPostsQuery} from "../../redux";
-import {fetchTags} from "../../redux/tags";
+import {fetchPosts} from "src/redux";
+import {fetchLastComments, useGetCommentsQuery, useGetPostsQuery} from "src/redux";
+import {fetchTags} from "src/redux/tags";
 
 
 const Home = () => {

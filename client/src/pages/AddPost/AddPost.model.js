@@ -1,4 +1,4 @@
-import axios from "../../utils/axios";
+
 
 export const addPost = async ({title, text, tags, imageUrl}) => {
     try {
