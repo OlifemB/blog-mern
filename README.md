@@ -7,8 +7,8 @@
 - Axios
 
 ### Backend
-- Express + Validator
-- MongoDB + Mongoose
+- Express
+- Mongoose
 - JWT
 - Multer
 - BCrypt
