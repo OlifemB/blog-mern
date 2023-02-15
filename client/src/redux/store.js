@@ -1,23 +1,25 @@
 import {configureStore, applyMiddleware, createStore} from "@reduxjs/toolkit";
 import logger from 'redux-logger'
-import {postsReducer} from "./post";
+import {postsReducer} from "./posts";
 import {userReducer} from "./user";
-import {commentsReducer} from "./comment";
+import {commentsReducer} from "./comments";
 import {tagsReducer} from "./tags";
 import {fullPostReducer} from "./fullPost";
+import {postsApi} from "./posts/posts.api";
 
 const reducer = {
     posts: postsReducer,
     user: userReducer,
     tags: tagsReducer,
     comments: commentsReducer,
-    fullPost: fullPostReducer
+    fullPost: fullPostReducer,
+    [postsApi.reducerPath]: postsApi.reducer,
 }
 
-const store = configureStore({
-    reducer,
-    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
-    devTools: process.env.NODE_ENV !== 'production',
-})
+const middlewares = (getDefaultMiddleware) => getDefaultMiddleware().concat(postsApi.middleware)
 
-export default store
+
+export const store = configureStore({
+    reducer,
+    middlewares,
+})

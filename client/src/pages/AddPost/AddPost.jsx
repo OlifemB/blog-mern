@@ -4,10 +4,11 @@ import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import styles from './AddPost.module.scss';
 import {useSelector} from "react-redux";
-import {selectIsAuth} from "../../redux/user";
+import {selectIsAuth} from "@/redux/user";
 import {useParams, useNavigate, Navigate} from "react-router-dom";
-import axios from "../../utils/axios";
-import {InputTags} from "../../components";
+import axios from "@/utils/axios";
+import {InputTags} from "@/components";
+import {useAddPostMutation} from "@/redux";
 
 const AddPost = () => {
     const isAuth = useSelector(selectIsAuth)
@@ -17,6 +18,8 @@ const AddPost = () => {
     const [text, setText] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const inputFileRef = useRef(null)
+    const [newPost, setNewPost] = useState('')
+    const [addPost, postData] = useAddPostMutation()
 
     const {id} = useParams()
     const isEditing = Boolean(id)
@@ -53,6 +56,18 @@ const AddPost = () => {
             setText('')
         }
     }, [isEditing])
+
+    const handleAddPost = async () => {
+        const fields = {
+            title: state.title,
+            text: text,
+            tags: tags,
+            imageUrl: state.imageUrl,
+        }
+        if (newPost) {
+            await addPost(fields).unwrap()
+        }
+    }
 
 
     const handleChangeFile = async (e) => {

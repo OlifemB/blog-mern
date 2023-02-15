@@ -15,7 +15,7 @@ export const PostList = ({posts, isLoading}) => {
                     {...post}
                     key={post._id}
                     isLoading={false}
-                    // isEditable={user.data._id === post.author._id}
+                    // isEditable={user.data._id === posts.author._id}
                 />
             )
     )

@@ -4,7 +4,7 @@ import styles from "./AddComment.module.scss";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUserData} from "../../redux/user";
 import {useParams} from "react-router-dom";
-import {addComment} from "../../redux/post";
+import {addComment} from "../../redux";
 
 export const AddComment = () => {
     const {id} = useParams()

@@ -37,6 +37,7 @@
     "@types/react-dom": "^18.0.10",
     "@types/react-redux": "^7.1.25",
     "@types/redux-logger": "^3.0.9",
+    "craco-alias": "^3.0.1",
     "sass": "^1.52.1",
     "typescript": "^4.9.5"
   },

@@ -37,7 +37,7 @@ const fullPostSlice = createSlice({
     reducers: {},
     extraReducers: {
 
-        // Get post
+        // Get posts
         [fetchFullPost.pending]: (state) => {
             state.data = []
             state.isLoading = true
@@ -51,7 +51,7 @@ const fullPostSlice = createSlice({
             state.isLoading = true
         },
 
-        // Get post comments
+        // Get posts comments
         [fetchPostComments.pending]: (state) => {
             state.data.comments = []
             state.isLoading = true

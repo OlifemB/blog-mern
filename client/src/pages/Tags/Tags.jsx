@@ -4,7 +4,7 @@ import {Container, Grid} from "@mui/material";
 import {CommentBlock, PostList, TagsBlock} from "../../components";
 import axios from "../../utils/axios";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchLastComments} from "../../redux/comment";
+import {fetchLastComments} from "../../redux";
 import {fetchTags} from "../../redux/tags";
 
 let renderCount = 0
@@ -15,10 +15,10 @@ const Tags = () => {
     const {id} = useParams()
     const tags = useSelector(state => state?.tags)
     const comments = useSelector(state => state?.comments)
+    const user = useSelector(state => state?.user)
     const [isLoading, setIsLoading] = useState(true)
     const [posts, setPosts] = useState({items: []})
 
-    console.log('tags', tags)
 
 
     useEffect(() => {
@@ -43,7 +43,7 @@ const Tags = () => {
     return (
         <Grid container spacing={4}>
             <Grid xs={8} item>
-                <PostList posts={posts.items} isLoading={posts.isLoading}/>
+                <PostList posts={posts.items} user={user} isLoading={posts.isLoading}/>
             </Grid>
 
             <Grid xs={4} item>

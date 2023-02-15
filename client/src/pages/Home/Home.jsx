@@ -4,8 +4,8 @@ import {Tabs, Tab, Grid, Container} from '@mui/material';
 import {TagsBlock, CommentBlock, PostList} from '../../components';
 
 import {useDispatch, useSelector} from "react-redux";
-import {fetchPosts} from "../../redux/post";
-import {fetchLastComments} from "../../redux/comment";
+import {fetchPosts} from "../../redux";
+import {fetchLastComments, useGetCommentsQuery, useGetPostsQuery} from "../../redux";
 import {fetchTags} from "../../redux/tags";
 
 
@@ -16,13 +16,16 @@ const Home = () => {
     const comments = useSelector(state => state?.comments)
     const user = useSelector(state => state?.user)
 
+    // const posts = useGetPostsQuery()
+
+    console.log(posts)
+
 
     useEffect(() => {
         dispatch(fetchPosts())
         dispatch(fetchTags())
         dispatch(fetchLastComments())
     }, [])
-
 
 
     return (

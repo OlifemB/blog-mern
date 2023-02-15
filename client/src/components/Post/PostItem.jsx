@@ -10,7 +10,7 @@ import {UserInfo} from '../UserInfo/UserInfo';
 import {PostSkeleton} from './PostSkeleton';
 import {Link, Navigate, useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import {removePost} from "../../redux/post";
+import {removePost} from "../../redux/posts";
 
 export const PostItem = (props) => {
     const {
@@ -34,7 +34,7 @@ export const PostItem = (props) => {
 
     const onClickRemove = async () => {
         try {
-            if (window.confirm('Delete post?')) {
+            if (window.confirm('Delete posts?')) {
                 if (isFullPost)
                     navigate(`/`)
                 await dispatch(removePost(_id))
